@@ -1,15 +1,12 @@
 --========================================================--
---        DB Panel - 配色修改版｜文字适度加大
---        半透明纯黑背景 / 按钮更黑 / 文字纯白不透明
+--   DB Panel · 纯净版（BS脚本已更新）
 --========================================================--
 
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 
--- 动态尺寸
 local function GetViewport()
     local cam = workspace.CurrentCamera
     if not cam then cam = workspace:WaitForChild("CurrentCamera", 2) end
@@ -24,25 +21,24 @@ local BUTTON_SIZE = 56
 local CORNER_RADIUS = 16
 local ANIMATION_TIME = 0.35
 
--- GUI
 local MainGui = Instance.new("ScreenGui")
-MainGui.Name = "DB_Panel"
+MainGui.Name = "DB_Panel_Fixed"
 MainGui.ResetOnSpawn = false
 MainGui.IgnoreGuiInset = true
 MainGui.DisplayOrder = 999
 MainGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-MainGui.Parent = LocalPlayer.PlayerGui
+MainGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
--- State
 local State = {
     PanelPosition = nil,
     ButtonPosition = nil,
     Animating = false,
     Minimized = false,
-    CurrentCategory = "通用"
+    CurrentCategory = "通用",
+    ButtonHidden = false,
+    HideSide = "none"
 }
 
--- Clamp
 local function ClampPosition(pos, size)
     local vp = GetViewport()
     local hx, hy = size.X/2, size.Y/2
@@ -52,7 +48,6 @@ local function ClampPosition(pos, size)
     )
 end
 
--- Rainbow
 local Rainbow = ColorSequence.new({
     ColorSequenceKeypoint.new(0, Color3.fromRGB(255,55,75)),
     ColorSequenceKeypoint.new(0.16, Color3.fromRGB(255,170,50)),
@@ -63,7 +58,6 @@ local Rainbow = ColorSequence.new({
     ColorSequenceKeypoint.new(1, Color3.fromRGB(255,55,190))
 })
 
--- Panel
 local Panel = Instance.new("Frame")
 Panel.Name = "Panel"
 Panel.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -106,7 +100,6 @@ local GlowGrad = Instance.new("UIGradient")
 GlowGrad.Color = Rainbow
 GlowGrad.Parent = Glow
 
--- Floating Button (DB)
 local FloatingButton = Instance.new("TextButton")
 FloatingButton.Name = "FloatingButton"
 FloatingButton.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -116,7 +109,7 @@ FloatingButton.BackgroundTransparency = 0.25
 FloatingButton.BorderSizePixel = 0
 FloatingButton.Text = "DB"
 FloatingButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-FloatingButton.TextSize = 22 --略微放大悬浮按钮文字
+FloatingButton.TextSize = 22
 FloatingButton.Font = Enum.Font.GothamBold
 FloatingButton.AutoButtonColor = false
 FloatingButton.Active = true
@@ -147,7 +140,6 @@ local BtnGlowGrad = Instance.new("UIGradient")
 BtnGlowGrad.Color = Rainbow
 BtnGlowGrad.Parent = BtnGlow
 
--- Rainbow Animation
 task.spawn(function()
     local rot = 0
     while MainGui.Parent do
@@ -160,7 +152,6 @@ task.spawn(function()
     end
 end)
 
--- Header
 local Header = Instance.new("Frame")
 Header.Size = UDim2.new(1, 0, 0, 50)
 Header.BackgroundTransparency = 1
@@ -186,7 +177,7 @@ Title.Position = UDim2.fromOffset(14, 10)
 Title.Size = UDim2.new(1, -40, 0, 28)
 Title.Text = "DB 功能面板"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 20 --标题放大
+Title.TextSize = 20
 Title.Font = Enum.Font.GothamBold
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.ZIndex = 21
@@ -198,7 +189,7 @@ Subtitle.Position = UDim2.fromOffset(16, 34)
 Subtitle.Size = UDim2.new(1, -40, 0, 14)
 Subtitle.Text = "点击分类 · 加载脚本"
 Subtitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-Subtitle.TextSize = 11 --副标题放大
+Subtitle.TextSize = 11
 Subtitle.Font = Enum.Font.GothamMedium
 Subtitle.TextXAlignment = Enum.TextXAlignment.Left
 Subtitle.ZIndex = 21
@@ -213,16 +204,16 @@ CloseBtn.BackgroundTransparency = 0.20
 CloseBtn.BorderSizePixel = 0
 CloseBtn.Text = "−"
 CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseBtn.TextSize = 30 --最小化按钮文字放大
+CloseBtn.TextSize = 30
 CloseBtn.Font = Enum.Font.GothamMedium
 CloseBtn.AutoButtonColor = false
 CloseBtn.ZIndex = 30
 CloseBtn.Parent = Header
+
 local CloseCorner = Instance.new("UICorner")
 CloseCorner.CornerRadius = UDim.new(0,12)
 CloseCorner.Parent = CloseBtn
 
--- Content
 local Content = Instance.new("Frame")
 Content.Position = UDim2.fromOffset(6, 56)
 Content.Size = UDim2.new(1, -12, 1, -64)
@@ -242,6 +233,7 @@ MenuScroll.BorderSizePixel = 0
 MenuScroll.ScrollBarThickness = 2
 MenuScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
 MenuScroll.Parent = LeftMenu
+
 local MenuLayout = Instance.new("UIListLayout")
 MenuLayout.Padding = UDim.new(0, 8)
 MenuLayout.Parent = MenuScroll
@@ -260,225 +252,171 @@ ListScroll.BorderSizePixel = 0
 ListScroll.ScrollBarThickness = 2
 ListScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
 ListScroll.Parent = RightList
+
 local ListLayout = Instance.new("UIListLayout")
 ListLayout.Padding = UDim.new(0, 8)
 ListLayout.Parent = ListScroll
 
--- Helpers
-local function ClearList()
-    for _, obj in pairs(ListScroll:GetChildren()) do
-        if obj:IsA("TextButton") then obj:Destroy() end
-    end
-end
+--========================================================--
+--   脚本数据库定义（通用已置顶，BS脚本已更新）
+--========================================================--
+local ScriptDatabase = {
+    ["通用"] = {
+        {Name = "飞行", Code = [[loadstring(game:HttpGet("https://pastefy.app/tkHc58Wt/raw"))()]]},
+        {Name = "子追", Code = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/HB-ksdb/-4/main/%E5%AD%90%E8%BF%BD%E8%84%9A%E6%9C%AC%E7%A9%BF%E5%A2%99.lua"))()]]},
+        {Name = "自瞄", Code = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/gycgchgyfytdttr/QQ-9-2-8-9-50173/refs/heads/main/cure.lua"))()]]},
+        {Name = "XK Hub(支持服务器进群)", Url = "https://github.com/devslopo/DVES/raw/main/XK%20Hub"},
+        {Name = "翻译脚本", Code = [[TX = "TX Script"; Script = "全自动翻译"; loadstring(game:HttpGet("https://raw.githubusercontent.com/JsYb666/Item/refs/heads/main/Auto-language"))()]]},
+        {Name = "霖溺支持服务器详情进主页群", Url = "https://raw.githubusercontent.com/ShenJiaoBen/ScriptLoader/refs/heads/main/Linni_FreeLoader.lua"},
+        {Name = "恐脚本支持服务器进主页群", Url = "https://raw.githubusercontent.com/kongbaNB/9178/refs/heads/main/恐脚本.NB"},
+        {Name = "BS脚本", Code = [[local BS = "\104\116\116\112\115\58\47\47\103\105\116\101\101\46\99\111\109\47\66\83\95\115\99\114\105\112\116\47\115\99\114\105\112\116\47\114\97\119\47\109\97\115\116\101\114\47\66\83\95\83\99\114\105\112\116\46\76\117\97\117"; loadstring(game:HttpGet(BS))()]]},
+        {Name = "动画脚本", Url = "https://rawscripts.net/raw/Universal-Script-FREE-BUNDLES-l-FE-241758"},
+        {Name = "皮脚本", Url = "https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"}
+    },
+    ["射击游戏"] = {
+        {Name = "特种部队模拟器", Url = "https://rawscripts.net/raw/Tactical:-Swat-Simulator-Six-Hub-215287"},
+        {Name = "刀战竞技场", Url = "https://rawscripts.net/raw/FPSKnife-Arena-Script-Auto-Kill-And-Speed-And-More-No-Key-102295"},
+        {Name = "狙击竞技场", Url = "https://rawscripts.net/raw/GAMEMODE-Sniper-Arena-Script-ESP-Aimbot-Auto-Fire-Keyless-206741"},
+        {Name = "战斗竞技场", Url = "https://pastebin.com/raw/bJvbP48n"},
+        {Name = "刀对决", Url = "https://raw.githubusercontent.com/imshrak/knifeduels/main/menu"},
+        {Name = "手枪竞技场", Url = "https://rawscripts.net/raw/Pistol-Arena-Vodka-hub-keyless-op-201209"}
+    },
+    ["角色扮演RPG"] = {
+        {Name = "圣奥里", Code = [[getgenv().XiaoPi="皮脚本-圣奥里"; loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaopi77/xiaopi77/refs/heads/main/Roblox-Pi-Script-SaintOrie.lua"))()]]},
+        {Name = "圣地亚哥角色扮演(刷钱)", Url = "https://paste.dot.com.in/p/csolyxih65/raw"},
+        {Name = "河北唐县", Code = [[getgenv().XiaoPi="皮脚本-河北唐县"; loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaopi77/xiaopi77/refs/heads/main/PIJIAOBEN-HEBEITANGXIAN.lua"))()]]}
+    },
+    ["休闲挂机"] = {
+        {Name = "偷走一个蛋｜群友：搁浅(小号) 投稿", Url = "https://raw.githubusercontent.com/kaisenlmao/loader/refs/heads/main/chiyo.lua"},
+        {Name = "踢一个幸运方块", Url = "https://raw.githubusercontent.com/fartez127-design/FARTEZHUB/refs/heads/main/FARTEZHUBXKickaLuckyBlock"}
+    },
+    ["竞技格斗"] = {},
+    ["休闲社交"] = {
+        {Name = "谋杀之谜MM2", Url = "https://raw.githubusercontent.com/snxpzscripts/mm2/refs/heads/main/MozqlHub"}
+    },
+    ["合作游戏"] = {
+        {Name = "动物医院", Url = "https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/FN_AnimalHospital.lua"},
+        {Name = "门｜群友提供@噬", Url = "https://api.luarmor.net/files/v4/loaders/730854e5b6499ee91deb1080e8e12ae3.lua"}
+    },
+    ["非对称竞技"] = {
+        {Name = "被遗弃｜群友提供@噬", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/ainianniang.lua"},
+        {Name = "致命猿猴", Url = "https://raw.githubusercontent.com/Anzzckc/Lethal-Ape-Beta/refs/heads/main/Lethal%20Ape%20Beta.lua"}
+    },
+    ["塔防游戏"] = {
+        {Name = "战斗砖块", Url = "https://rawscripts.net/raw/The-Battle-Bricks-auto-play-no-key-141463"}
+    }
+}
 
-local function MakeMenuButton(name, callback)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, 0, 0, 30)
-    btn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    btn.BackgroundTransparency = 0.18
-    btn.BorderSizePixel = 0
-    btn.Text = name
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.TextSize = 14 --左侧分类文字加大
-    btn.Font = Enum.Font.GothamMedium
-    btn.TextXAlignment = Enum.TextXAlignment.Left
-    btn.AutoButtonColor = false
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 10)
-    corner.Parent = btn
-    local pad = Instance.new("UIPadding")
-    pad.PaddingLeft = UDim.new(0, 12)
-    pad.Parent = btn
-    btn.MouseButton1Click:Connect(callback)
-    return btn
-end
+--========================================================--
+--   核心执行与UI点击逻辑
+--========================================================--
 
-local function MakeScriptButton(name, callback)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, 0, 0, 28)
-    btn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    btn.BackgroundTransparency = 0.18
-    btn.BorderSizePixel = 0
-    btn.Text = name
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.TextSize = 13 --脚本列表文字加大
-    btn.Font = Enum.Font.GothamMedium
-    btn.TextXAlignment = Enum.TextXAlignment.Left
-    btn.AutoButtonColor = false
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 8)
-    corner.Parent = btn
-    local pad = Instance.new("UIPadding")
-    pad.PaddingLeft = UDim.new(0, 12)
-    pad.Parent = btn
-    btn.MouseButton1Click:Connect(callback)
-    return btn
-end
-
--- Load functions (完整追加全部脚本)
-local function SafeLoadScript(customCode, url)
+local function SafeLoadScript(item)
     task.spawn(function()
-        pcall(function()
-            if customCode then
-                loadstring(customCode)()
-            else
-                local src = game:HttpGet(url)
+        local success, err = pcall(function()
+            if item.Code then
+                loadstring(item.Code)()
+            elseif item.Url then
+                local src = game:HttpGet(item.Url)
                 loadstring(src)()
             end
         end)
+        if not success then
+            warn("❌ 脚本加载失败: " .. tostring(err))
+        end
     end)
 end
 
-local function LoadCommon()
-    ClearList()
-    local btn1 = MakeScriptButton("XK Hub(支持服务器进群)", function()
-        SafeLoadScript(nil, "https://github.com/devslopo/DVES/raw/main/XK%20Hub")
+local function ApplySafeClickEffect(btn, onClick)
+    btn.Activated:Connect(function()
+        local origBg = btn.BackgroundColor3
+        btn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+        TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = origBg}):Play()
+        if onClick then
+            onClick()
+        end
     end)
-    btn1.Parent = ListScroll
-    local btn2 = MakeScriptButton("翻译脚本", function()
-        local code = [[TX = "TX Script"
-Script = "全自动翻译"
-loadstring(game:HttpGet("https://raw.githubusercontent.com/JsYb666/Item/refs/heads/main/Auto-language"))()]]
-        SafeLoadScript(code,nil)
-    end)
-    btn2.Parent = ListScroll
-    local btn3 = MakeScriptButton("霖溺支持服务器详情进主页群", function()
-        SafeLoadScript(nil,"https://raw.githubusercontent.com/ShenJiaoBen/ScriptLoader/refs/heads/main/Linni_FreeLoader.lua")
-    end)
-    btn3.Parent = ListScroll
-    local btn4 = MakeScriptButton("恐脚本支持服务器进主页群", function()
-        SafeLoadScript(nil,"https://raw.githubusercontent.com/kongbaNB/9178/refs/heads/main/恐脚本.NB")
-    end)
-    btn4.Parent = ListScroll
-    local btn5 = MakeScriptButton("BS脚本", function()
-        local code = [[BS = "\104\116\116\112\115\58\47\47\103\105\116\101\101\46\99\111\109\47\66\83\95\115\99\114\105\112\116\47\115\99\114\105\112\116\47\114\97\119\47\109\97\115\116\101\114\47\66\83\95\83\99\114\105\112\116\46\76\117\97\117"
-loadstring(game:HttpGet(BS))()]]
-        SafeLoadScript(code,nil)
-    end)
-    btn5.Parent = ListScroll
-    local btn6 = MakeScriptButton("动画脚本", function()
-        SafeLoadScript(nil,"https://rawscripts.net/raw/Universal-Script-FREE-BUNDLES-l-FE-241758")
-    end)
-    btn6.Parent = ListScroll
-    local btn7 = MakeScriptButton("皮脚本", function()
-        SafeLoadScript(nil,"https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua")
-    end)
-    btn7.Parent = ListScroll
-    local btn8 = MakeScriptButton("公益飞行(彩虹版)", function()
-        SafeLoadScript(nil,"https://pastefy.app/tkHc58Wt/raw")
-    end)
-    btn8.Parent = ListScroll
-    local btn9 = MakeScriptButton("子追", function()
-        SafeLoadScript(nil,"https://raw.githubusercontent.com/HB-ksdb/-4/main/%E5%AD%90%E8%BF%BD%E8%84%9A%E6%9C%AC%E7%A9%BF%E5%A2%99.lua")
-    end)
-    btn9.Parent = ListScroll
-    local btn10 = MakeScriptButton("自瞄", function()
-        SafeLoadScript(nil,"https://raw.githubusercontent.com/gycgchgyfytdttr/QQ-9-2-8-9-50173/refs/heads/main/cure.lua")
-    end)
-    btn10.Parent = ListScroll
 end
 
-local function LoadShooter()
-    ClearList()
-    local btn = MakeScriptButton("特种部队模拟器", function()
-        SafeLoadScript(nil,"https://rawscripts.net/raw/Tactical-Simulator-Six-Hub-215287")
-    end)
-    btn.Parent = ListScroll
+local function RenderRightList(categoryName)
+    for _, child in ipairs(ListScroll:GetChildren()) do
+        if child:IsA("TextButton") then
+            child:Destroy()
+        end
+    end
+
+    local list = ScriptDatabase[categoryName] or {}
+    for _, item in ipairs(list) do
+        local btn = Instance.new("TextButton")
+        btn.Name = item.Name
+        btn.Size = UDim2.new(1, 0, 0, 32)
+        btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+        btn.BackgroundTransparency = 0.2
+        btn.BorderSizePixel = 0
+        btn.Text = item.Name
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.TextSize = 13
+        btn.Font = Enum.Font.GothamMedium
+        btn.TextXAlignment = Enum.TextXAlignment.Left
+        btn.AutoButtonColor = false
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 8)
+        corner.Parent = btn
+
+        local pad = Instance.new("UIPadding")
+        pad.PaddingLeft = UDim.new(0, 12)
+        pad.Parent = btn
+
+        ApplySafeClickEffect(btn, function()
+            SafeLoadScript(item)
+        end)
+
+        btn.Parent = ListScroll
+    end
 end
 
-local function LoadRPG()
-    ClearList()
-    local btn1 = MakeScriptButton("圣奥里", function()
-        local code = [[getgenv().XiaoPi="皮脚本-圣奥里" 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaopi77/xiaopi77/refs/heads/main/Roblox-Pi-Script-SaintOrie.lua"))()]]
-        SafeLoadScript(code, nil)
-    end)
-    btn1.Parent = ListScroll
-    local btn2 = MakeScriptButton("圣地亚哥角色扮演(刷钱)", function()
-        SafeLoadScript(nil,"https://paste.dot.com.in/p/csolyxih65/raw")
-    end)
-    btn2.Parent = ListScroll
-    local btn3 = MakeScriptButton("河北唐县", function()
-        local code = [[getgenv().XiaoPi="皮脚本-河北唐县"
-loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaopi77/xiaopi77/refs/heads/main/PIJIAOBEN-HEBEITANGXIAN.lua"))()]]
-        SafeLoadScript(code, nil)
-    end)
-    btn3.Parent = ListScroll
-end
-
-local function LoadIdle()
-    ClearList()
-    local btn = MakeScriptButton("偷走一个蛋｜群友：搁浅(小号) 投稿", function()
-        SafeLoadScript(nil,"https://raw.githubusercontent.com/kaisenlmao/loader/refs/heads/main/chiyo.lua")
-    end)
-    btn.Parent = ListScroll
-end
-
-local function LoadFighting() ClearList() end
-
-local function LoadCasual()
-    ClearList()
-    local btn1 = MakeScriptButton("谋杀之谜MM2", function()
-        SafeLoadScript(nil,"https://raw.githubusercontent.com/snxpzscripts/mm2/refs/heads/main/MozqlHub")
-    end)
-    btn1.Parent = ListScroll
-    local btn2 = MakeScriptButton("NPC或死", function()
-        SafeLoadScript(nil,"https://raw.githubusercontent.com/Bac0nHck/Scripts/refs/heads/main/BeNpcOrDie")
-    end)
-    btn2.Parent = ListScroll
-    local btn3 = MakeScriptButton("重型钓鱼", function()
-        SafeLoadScript(nil,"https://raw.githubusercontent.com/bvect1037-alt/KhfreshHub/refs/heads/main/Bmonkie")
-    end)
-    btn3.Parent = ListScroll
-end
-
-local function LoadCoop()
-    ClearList()
-    local btn1 = MakeScriptButton("动物医院", function()
-        SafeLoadScript(nil,"https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/FN_AnimalHospital.lua")
-    end)
-    btn1.Parent = ListScroll
-    local btn2 = MakeScriptButton("门(群友@噬)", function()
-        SafeLoadScript(nil,"https://api.luarmor.net/files/v4/loaders/730854e5b6499ee91deb1080e8e12ae3.lua")
-    end)
-    btn2.Parent = ListScroll
-    local btn3 = MakeScriptButton("亡命速递", function()
-        SafeLoadScript(nil,"https://raw.githubusercontent.com/SNSDARK/Scripts/refs/heads/main/Deadly%20Delivery.lua")
-    end)
-    btn3.Parent = ListScroll
-end
-
--- 新增分类：非对称竞技
-local function LoadAsymmetric()
-    ClearList()
-    local btn = MakeScriptButton("被遗弃(群友@噬)", function()
-        SafeLoadScript(nil,"https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/ainianniang.lua")
-    end)
-    btn.Parent = ListScroll
-end
-
--- Menu按钮列表：已移除【模拟器、塔防游戏】，新增【非对称竞技】
-local categoryMap = {
-    {"通用", LoadCommon},
-    {"射击游戏", LoadShooter},
-    {"角色扮演RPG", LoadRPG},
-    {"休闲挂机", LoadIdle},
-    {"竞技格斗", LoadFighting},
-    {"休闲社交", LoadCasual},
-    {"合作游戏", LoadCoop},
-    {"非对称竞技", LoadAsymmetric}
+local categoriesOrder = {
+    "通用", "射击游戏", "角色扮演RPG", "休闲挂机",
+    "竞技格斗", "休闲社交", "合作游戏", "非对称竞技", "塔防游戏"
 }
-for _, pair in ipairs(categoryMap) do
-    local name, func = pair[1], pair[2]
-    local btn = MakeMenuButton(name, function()
-        State.CurrentCategory = name
-        func()
+
+for _, catName in ipairs(categoriesOrder) do
+    local btn = Instance.new("TextButton")
+    btn.Name = "Category_" .. catName
+    btn.Size = UDim2.new(1, 0, 0, 32)
+    btn.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    btn.BackgroundTransparency = 0.25
+    btn.BorderSizePixel = 0
+    btn.Text = catName
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 14
+    btn.Font = Enum.Font.GothamMedium
+    btn.TextXAlignment = Enum.TextXAlignment.Left
+    btn.AutoButtonColor = false
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 10)
+    corner.Parent = btn
+
+    local pad = Instance.new("UIPadding")
+    pad.PaddingLeft = UDim.new(0, 12)
+    pad.Parent = btn
+
+    ApplySafeClickEffect(btn, function()
+        State.CurrentCategory = catName
+        RenderRightList(catName)
     end)
+
     btn.Parent = MenuScroll
 end
-LoadCommon()
 
--- Position functions
+RenderRightList("通用")
+
+--========================================================--
+--   窗口拖拽、最小化与位置计算
+--========================================================--
+
 local function SetPanelPosition(pos)
     local new = ClampPosition(pos, Vector2.new(panelWidth, panelHeight))
     State.PanelPosition = new
@@ -495,9 +433,6 @@ local vp = GetViewport()
 SetPanelPosition(Vector2.new(vp.X/2, vp.Y/2))
 SetButtonPosition(Vector2.new(vp.X * 0.12, vp.Y * 0.35))
 
--- ═══════════════════════════════════════════════════════════
--- 先定义 Minimize 和 Restore（重要！）
--- ═══════════════════════════════════════════════════════════
 local function Minimize()
     if State.Animating or State.Minimized then return end
     State.Animating = true
@@ -513,6 +448,8 @@ local function Minimize()
     Panel.Size = UDim2.fromOffset(panelWidth, panelHeight)
     FloatingButton.Size = UDim2.fromOffset(40, 40)
     FloatingButton.Visible = true
+    State.ButtonHidden = false
+    State.HideSide = "none"
     SetButtonPosition(savedBtnPos)
 
     local btnTween = TweenService:Create(FloatingButton, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
@@ -527,7 +464,24 @@ local function Restore()
     if State.Animating or not State.Minimized then return end
     State.Animating = true
 
-    -- 强制面板回到屏幕中央
+    if State.ButtonHidden then
+        local restorePos = State.ButtonPosition
+        if not restorePos then
+            local vp = GetViewport()
+            restorePos = Vector2.new(vp.X * 0.12, vp.Y * 0.35)
+        end
+        local vp = GetViewport()
+        local half = BUTTON_SIZE / 2
+        restorePos = Vector2.new(
+            math.clamp(restorePos.X, half, vp.X - half),
+            math.clamp(restorePos.Y, half, vp.Y - half)
+        )
+        SetButtonPosition(restorePos)
+        State.ButtonHidden = false
+        State.HideSide = "none"
+        task.wait(0.05)
+    end
+
     local vp = GetViewport()
     local centerPos = Vector2.new(vp.X / 2, vp.Y / 2)
     SetPanelPosition(centerPos)
@@ -545,14 +499,10 @@ local function Restore()
     State.Animating = false
 end
 
--- ═══════════════════════════════════════════════════════════
--- 增强版拖动函数（支持点击/拖动区分）
--- ═══════════════════════════════════════════════════════════
-local function EnableDrag(handle, getPos, setPos, onClick)
+local function EnableDrag(handle, getPos, setPos)
     local dragging = false
     local startInput, startObj, touchInput
     local beganPos = nil
-    local threshold = 10
 
     handle.InputBegan:Connect(function(inp)
         if State.Animating then return end
@@ -577,51 +527,134 @@ local function EnableDrag(handle, getPos, setPos, onClick)
 
     UserInputService.InputEnded:Connect(function(inp)
         if inp.UserInputType == Enum.UserInputType.MouseButton1 or (inp.UserInputType == Enum.UserInputType.Touch and inp == touchInput) then
-            local isClick = false
-            if beganPos and inp.Position then
-                local dist = (beganPos - inp.Position).Magnitude
-                if dist < threshold then
-                    isClick = true
-                end
-            end
             dragging = false
             startInput = nil; startObj = nil; touchInput = nil
-            if isClick and onClick then
-                onClick()
-            end
             beganPos = nil
         end
     end)
 end
 
--- 面板拖动（标题栏）
-EnableDrag(DragArea, function() return State.PanelPosition end, SetPanelPosition, nil)
+EnableDrag(DragArea, function() return State.PanelPosition end, SetPanelPosition)
 
--- 按钮拖动 + 点击恢复（此时 Restore 已定义）
-EnableDrag(FloatingButton, function() return State.ButtonPosition end, SetButtonPosition, function()
-    if not State.Animating then
-        Restore()
+local btnDragging = false
+local btnDragStartPos = nil
+local btnDragStartMouse = nil
+local dragDistance = 0
+local CLICK_THRESHOLD = 10
+local EDGE_SNAP_DIST = 60
+local currentTween = nil
+
+local function SnapToEdge()
+    if currentTween and currentTween.PlaybackState == Enum.PlaybackState.Playing then
+        currentTween:Cancel()
+        currentTween = nil
+    end
+    local vp = GetViewport()
+    local btnPos = FloatingButton.Position
+    local x = btnPos.X.Offset
+    local y = btnPos.Y.Offset
+    local halfSize = BUTTON_SIZE / 2
+    local edgeDistLeft = x - halfSize
+    local edgeDistRight = (vp.X - halfSize) - x
+    if State.ButtonHidden then return end
+    local snap = false
+    local newX = x
+    local side = "none"
+    if edgeDistLeft < EDGE_SNAP_DIST and edgeDistLeft < edgeDistRight then
+        newX = 10 + halfSize
+        side = "left"
+        snap = true
+    elseif edgeDistRight < EDGE_SNAP_DIST and edgeDistRight < edgeDistLeft then
+        newX = vp.X - 10 - halfSize
+        side = "right"
+        snap = true
+    end
+    if snap then
+        local targetPos = Vector2.new(newX, y)
+        currentTween = TweenService:Create(FloatingButton, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+            {Position = UDim2.fromOffset(targetPos.X, targetPos.Y)})
+        currentTween:Play()
+        currentTween.Completed:Connect(function() currentTween = nil end)
+        State.ButtonHidden = true
+        State.HideSide = side
+        State.ButtonPosition = targetPos
+    else
+        local clampedX = math.clamp(x, halfSize, vp.X - halfSize)
+        local clampedY = math.clamp(y, halfSize, vp.Y - halfSize)
+        if clampedX ~= x or clampedY ~= y then
+            local targetPos = Vector2.new(clampedX, clampedY)
+            FloatingButton.Position = UDim2.fromOffset(targetPos.X, targetPos.Y)
+            State.ButtonPosition = targetPos
+        else
+            State.ButtonPosition = Vector2.new(x, y)
+        end
+    end
+end
+
+FloatingButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        btnDragging = true
+        btnDragStartPos = FloatingButton.Position
+        btnDragStartMouse = input.Position
+        dragDistance = 0
+        if currentTween and currentTween.PlaybackState == Enum.PlaybackState.Playing then
+            currentTween:Cancel()
+            currentTween = nil
+        end
     end
 end)
 
--- 关闭按钮最小化
+UserInputService.InputChanged:Connect(function(input)
+    if not btnDragging then return end
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        local delta = input.Position - btnDragStartMouse
+        dragDistance = dragDistance + delta.Magnitude
+        local newX = btnDragStartPos.X.Offset + delta.X
+        local newY = btnDragStartPos.Y.Offset + delta.Y
+        local vp = GetViewport()
+        local halfSize = BUTTON_SIZE / 2
+        newX = math.clamp(newX, -halfSize + 5, vp.X + halfSize - 5)
+        newY = math.clamp(newY, halfSize, vp.Y - halfSize)
+        FloatingButton.Position = UDim2.fromOffset(newX, newY)
+        State.ButtonPosition = Vector2.new(newX, newY)
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if btnDragging then
+            local dist = dragDistance
+            btnDragging = false
+            btnDragStartPos = nil
+            btnDragStartMouse = nil
+            if dist < CLICK_THRESHOLD then
+                if State.ButtonHidden then
+                    local vp = GetViewport()
+                    local half = BUTTON_SIZE / 2
+                    local restoreX = math.clamp(State.ButtonPosition.X, half, vp.X - half)
+                    local restoreY = math.clamp(State.ButtonPosition.Y, half, vp.Y - half)
+                    local restorePos = Vector2.new(restoreX, restoreY)
+                    SetButtonPosition(restorePos)
+                    State.ButtonHidden = false
+                    State.HideSide = "none"
+                    task.wait(0.05)
+                end
+                if State.Minimized and not State.Animating then
+                    Restore()
+                end
+            else
+                SnapToEdge()
+            end
+        end
+    end
+end)
+
 CloseBtn.Activated:Connect(Minimize)
 
--- 视口变化处理
-local cam = workspace.CurrentCamera
-if cam then
-    cam:GetPropertyChangedSignal("ViewportSize"):Connect(function()
-        if State.Minimized then
-            SetButtonPosition(State.ButtonPosition)
-        else
-            SetPanelPosition(State.PanelPosition)
-        end
-    end)
-end
-
--- 初始状态
 Panel.Visible = true
 FloatingButton.Visible = false
 State.Minimized = false
+State.ButtonHidden = false
+State.HideSide = "none"
 
-print("✅ DB Panel | 配色：半透纯黑，文字适度增大版本加载完成")
+print("✅ DB Panel 已加载（BS脚本已更新）")
