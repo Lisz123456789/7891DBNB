@@ -1,5 +1,5 @@
 --========================================================--
---   DB Panel · 纯净版（已添加三个新脚本）
+--   DB Panel · 最终版（尺寸已调小）
 --========================================================--
 
 local Players = game:GetService("Players")
@@ -14,9 +14,9 @@ local function GetViewport()
 end
 
 local viewport = GetViewport()
-local baseW, baseH = 650, 460
-local panelWidth = math.clamp(viewport.X * 0.65, 400, baseW)
-local panelHeight = math.clamp(panelWidth * (baseH / baseW), 280, baseH)
+local baseW, baseH = 550, 370
+local panelWidth = math.clamp(viewport.X * 0.62, 380, baseW)
+local panelHeight = math.clamp(panelWidth * (baseH / baseW), 260, baseH)
 local BUTTON_SIZE = 56
 local CORNER_RADIUS = 16
 local ANIMATION_TIME = 0.35
@@ -175,7 +175,7 @@ local Title = Instance.new("TextLabel")
 Title.BackgroundTransparency = 1
 Title.Position = UDim2.fromOffset(14, 10)
 Title.Size = UDim2.new(1, -40, 0, 28)
-Title.Text = "DB 功能面板"
+Title.Text = "数据库"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 20
 Title.Font = Enum.Font.GothamBold
@@ -258,7 +258,7 @@ ListLayout.Padding = UDim.new(0, 8)
 ListLayout.Parent = ListScroll
 
 --========================================================--
---   脚本数据库定义（已添加三个新脚本）
+--   脚本数据库定义（含所有新增脚本）
 --========================================================--
 local ScriptDatabase = {
     ["通用"] = {
@@ -280,7 +280,8 @@ local ScriptDatabase = {
         {Name = "战斗竞技场", Url = "https://pastebin.com/raw/bJvbP48n"},
         {Name = "刀对决", Url = "https://raw.githubusercontent.com/imshrak/knifeduels/main/menu"},
         {Name = "手枪竞技场", Url = "https://rawscripts.net/raw/Pistol-Arena-Vodka-hub-keyless-op-201209"},
-        {Name = "监狱人生(不好用可以用XK)", Code = [[loadstring(game:HttpGet("https://rawscripts.net/raw/Prison-Life-auto-arrest-inf-jump-teleport-and-etc-242404"))()]]}
+        {Name = "监狱人生(不好用可以用XK)", Code = [[loadstring(game:HttpGet("https://rawscripts.net/raw/Prison-Life-auto-arrest-inf-jump-teleport-and-etc-242404"))()]]},
+        {Name = "莱克星顿和康科德(LC)", Code = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Matds78/Script/refs/heads/main/LC"))()]]}
     },
     ["角色扮演RPG"] = {
         {Name = "圣奥里", Code = [[getgenv().XiaoPi="皮脚本-圣奥里"; loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaopi77/xiaopi77/refs/heads/main/Roblox-Pi-Script-SaintOrie.lua"))()]]},
@@ -291,19 +292,24 @@ local ScriptDatabase = {
     ["休闲挂机"] = {
         {Name = "偷走一个蛋｜群友：搁浅(小号) 投稿", Url = "https://raw.githubusercontent.com/kaisenlmao/loader/refs/heads/main/chiyo.lua"},
         {Name = "踢一个幸运方块", Url = "https://raw.githubusercontent.com/fartez127-design/FARTEZHUB/refs/heads/main/FARTEZHUBXKickaLuckyBlock"},
-        {Name = "偷一个蛋", Code = [[loadstring(game:HttpGet("https://solixhub.com/loader"))()]]}
+        {Name = "偷一个蛋", Code = [[loadstring(game:HttpGet("https://solixhub.com/loader"))()]]},
+        {Name = "重型钓鱼(脚本不能用看群公告)", Code = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/linni-fish/HeavyFishing/main/Fishing.lua"))()]]}
     },
     ["竞技格斗"] = {},
     ["休闲社交"] = {
-        {Name = "谋杀之谜MM2", Url = "https://raw.githubusercontent.com/snxpzscripts/mm2/refs/heads/main/MozqlHub"}
+        {Name = "谋杀之谜MM2", Url = "https://raw.githubusercontent.com/snxpzscripts/mm2/refs/heads/main/MozqlHub"},
+        {Name = "NPC或死", Code = [[loadstring(game:HttpGet('https://raw.githubusercontent.com/ToraScript/Script/main/BENPCORDIE', true))()]]},
+        {Name = "画我", Code = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/KENNY画我.lua"))()]]}
     },
     ["合作游戏"] = {
         {Name = "动物医院", Url = "https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/FN_AnimalHospital.lua"},
-        {Name = "门｜群友提供@噬", Url = "https://api.luarmor.net/files/v4/loaders/730854e5b6499ee91deb1080e8e12ae3.lua"}
+        {Name = "门｜群友提供@噬", Url = "https://api.luarmor.net/files/v4/loaders/730854e5b6499ee91deb1080e8e12ae3.lua"},
+        {Name = "恐鬼症", Code = [[loadstring(game:HttpGet('https://raw.githubusercontent.com/Aoruen/Roblox-Stuff/refs/heads/main/Dusty%20Trip%20Gui%20V2.lua'))()]]}
     },
     ["非对称竞技"] = {
         {Name = "被遗弃｜群友提供@噬", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/ainianniang.lua"},
-        {Name = "致命猿猴", Url = "https://raw.githubusercontent.com/Anzzckc/Lethal-Ape-Beta/refs/heads/main/Lethal%20Ape%20Beta.lua"}
+        {Name = "致命猿猴", Url = "https://raw.githubusercontent.com/Anzzckc/Lethal-Ape-Beta/refs/heads/main/Lethal%20Ape%20Beta.lua"},
+        {Name = "暴力区", Code = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/lixxWW/ViolenceDistrict/refs/heads/main/ViolenceDistrict.lua"))()]]}
     },
     ["塔防游戏"] = {
         {Name = "战斗砖块", Url = "https://rawscripts.net/raw/The-Battle-Bricks-auto-play-no-key-141463"}
@@ -660,4 +666,4 @@ State.Minimized = false
 State.ButtonHidden = false
 State.HideSide = "none"
 
-print("✅ DB Panel 已加载（已添加三个新脚本）")
+print("✅ DB Panel 已加载（尺寸已调小）")
