@@ -1,5 +1,5 @@
 --========================================================--
---   DB Panel · 纯净版（BS脚本已更新）
+--   DB Panel · 纯净版（已添加三个新脚本）
 --========================================================--
 
 local Players = game:GetService("Players")
@@ -258,7 +258,7 @@ ListLayout.Padding = UDim.new(0, 8)
 ListLayout.Parent = ListScroll
 
 --========================================================--
---   脚本数据库定义（通用已置顶，BS脚本已更新）
+--   脚本数据库定义（已添加三个新脚本）
 --========================================================--
 local ScriptDatabase = {
     ["通用"] = {
@@ -279,16 +279,19 @@ local ScriptDatabase = {
         {Name = "狙击竞技场", Url = "https://rawscripts.net/raw/GAMEMODE-Sniper-Arena-Script-ESP-Aimbot-Auto-Fire-Keyless-206741"},
         {Name = "战斗竞技场", Url = "https://pastebin.com/raw/bJvbP48n"},
         {Name = "刀对决", Url = "https://raw.githubusercontent.com/imshrak/knifeduels/main/menu"},
-        {Name = "手枪竞技场", Url = "https://rawscripts.net/raw/Pistol-Arena-Vodka-hub-keyless-op-201209"}
+        {Name = "手枪竞技场", Url = "https://rawscripts.net/raw/Pistol-Arena-Vodka-hub-keyless-op-201209"},
+        {Name = "监狱人生(不好用可以用XK)", Code = [[loadstring(game:HttpGet("https://rawscripts.net/raw/Prison-Life-auto-arrest-inf-jump-teleport-and-etc-242404"))()]]}
     },
     ["角色扮演RPG"] = {
         {Name = "圣奥里", Code = [[getgenv().XiaoPi="皮脚本-圣奥里"; loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaopi77/xiaopi77/refs/heads/main/Roblox-Pi-Script-SaintOrie.lua"))()]]},
         {Name = "圣地亚哥角色扮演(刷钱)", Url = "https://paste.dot.com.in/p/csolyxih65/raw"},
-        {Name = "河北唐县", Code = [[getgenv().XiaoPi="皮脚本-河北唐县"; loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaopi77/xiaopi77/refs/heads/main/PIJIAOBEN-HEBEITANGXIAN.lua"))()]]}
+        {Name = "河北唐县", Code = [[getgenv().XiaoPi="皮脚本-河北唐县"; loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaopi77/xiaopi77/refs/heads/main/PIJIAOBEN-HEBEITANGXIAN.lua"))()]]},
+        {Name = "恶名昭彰收获日体验", Code = [[loadstring(game:HttpGet("https://rawscripts.net/raw/Notoriety:-A-PAYDAY(r)-Experience-XXMZ-HUB-177374"))()]]}
     },
     ["休闲挂机"] = {
         {Name = "偷走一个蛋｜群友：搁浅(小号) 投稿", Url = "https://raw.githubusercontent.com/kaisenlmao/loader/refs/heads/main/chiyo.lua"},
-        {Name = "踢一个幸运方块", Url = "https://raw.githubusercontent.com/fartez127-design/FARTEZHUB/refs/heads/main/FARTEZHUBXKickaLuckyBlock"}
+        {Name = "踢一个幸运方块", Url = "https://raw.githubusercontent.com/fartez127-design/FARTEZHUB/refs/heads/main/FARTEZHUBXKickaLuckyBlock"},
+        {Name = "偷一个蛋", Code = [[loadstring(game:HttpGet("https://solixhub.com/loader"))()]]}
     },
     ["竞技格斗"] = {},
     ["休闲社交"] = {
@@ -657,4 +660,4 @@ State.Minimized = false
 State.ButtonHidden = false
 State.HideSide = "none"
 
-print("✅ DB Panel 已加载（BS脚本已更新）")
+print("✅ DB Panel 已加载（已添加三个新脚本）")
