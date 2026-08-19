@@ -271,7 +271,10 @@ local ScriptDatabase = {
         {Name = "恐脚本支持服务器进主页群", Url = "https://raw.githubusercontent.com/kongbaNB/9178/refs/heads/main/恐脚本.NB"},
         {Name = "BS脚本", Code = [[local BS = "\104\116\116\112\115\58\47\47\103\105\116\101\101\46\99\111\109\47\66\83\95\115\99\114\105\112\116\47\115\99\114\105\112\116\47\114\97\119\47\109\97\115\116\101\114\47\66\83\95\83\99\114\105\112\116\46\76\117\97\117"; loadstring(game:HttpGet(BS))()]]},
         {Name = "动画脚本", Url = "https://rawscripts.net/raw/Universal-Script-FREE-BUNDLES-l-FE-241758"},
-        {Name = "皮脚本", Url = "https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"}
+        {Name = "皮脚本", Url = "https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"},
+        {Name = "TrashHub", Code = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/WasKKal/OnlyJumpToOther/main/loader.lua"))()]]},
+        {Name = "隐身", Code = [[loadstring(game:HttpGet('https://pastefy.app/6zjosppv/raw'))()]]},
+        {Name = "霖溺通用", Code = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/ShenJiaoBen/Partial-Server-Ribbon/refs/heads/main/Linni_Universal.txt"))()]]}
     },
     ["射击游戏"] = {
         {Name = "特种部队模拟器", Url = "https://rawscripts.net/raw/Tactical:-Swat-Simulator-Six-Hub-215287"},
@@ -281,7 +284,9 @@ local ScriptDatabase = {
         {Name = "刀对决", Url = "https://raw.githubusercontent.com/imshrak/knifeduels/main/menu"},
         {Name = "手枪竞技场", Url = "https://rawscripts.net/raw/Pistol-Arena-Vodka-hub-keyless-op-201209"},
         {Name = "监狱人生(不好用可以用XK)", Code = [[loadstring(game:HttpGet("https://rawscripts.net/raw/Prison-Life-auto-arrest-inf-jump-teleport-and-etc-242404"))()]]},
-        {Name = "莱克星顿和康科德(LC)", Code = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Matds78/Script/refs/heads/main/LC"))()]]}
+        {Name = "莱克星顿和康科德(LC)", Code = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Matds78/Script/refs/heads/main/LC"))()]]},
+        {Name = "杀手VS警长", Code = [[loadstring(game:HttpGet("https://rawscripts.net/raw/DUELS-Murderers-VS-Sheriffs-BEST-SCRIPT-SILENT-AIM-AIMBOT-ESP-RAGEBOT-AND-ALOT-MORE-227237"))()]]},
+        {Name = "凶手VS警长决斗", Code = [[loadstring(game:HttpGet("https://rawscripts.net/raw/Murderers-VS-Sheriffs-DUELS-mvsd-script-open-source-many-features-undetected-244205"))()]]}
     },
     ["角色扮演RPG"] = {
         {Name = "圣奥里", Code = [[getgenv().XiaoPi="皮脚本-圣奥里"; loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaopi77/xiaopi77/refs/heads/main/Roblox-Pi-Script-SaintOrie.lua"))()]]},
@@ -304,7 +309,10 @@ local ScriptDatabase = {
     ["合作游戏"] = {
         {Name = "动物医院", Url = "https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/FN_AnimalHospital.lua"},
         {Name = "门｜群友提供@噬", Url = "https://api.luarmor.net/files/v4/loaders/730854e5b6499ee91deb1080e8e12ae3.lua"},
-        {Name = "恐鬼症", Code = [[loadstring(game:HttpGet('https://raw.githubusercontent.com/Aoruen/Roblox-Stuff/refs/heads/main/Dusty%20Trip%20Gui%20V2.lua'))()]]}
+        {Name = "恐鬼症", Code = [[loadstring(game:HttpGet('https://raw.githubusercontent.com/Aoruen/Roblox-Stuff/refs/heads/main/Dusty%20Trip%20Gui%20V2.lua'))()]]},
+        {Name = "森林中的99夜", Code = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/caomod2077/Script/refs/heads/main/FoxnameHub.lua"))()]]},
+        {Name = "彩虹朋友1", Code = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Iliankytb/Iliankytb/main/BestRainbowFriendOne"))()]]},
+        {Name = "死铁轨", Code = [[loadstring(game:HttpGet("https://raw.githubusercontent.com/erewe23/deadrailsring.github.io/refs/heads/main/ringta.lua"))()]]}
     },
     ["非对称竞技"] = {
         {Name = "被遗弃｜群友提供@噬", Url = "https://raw.githubusercontent.com/ke9460394-dot/ugik/refs/heads/main/ainianniang.lua"},
