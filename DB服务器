@@ -1,0 +1,28 @@
+local scripts = {
+    {placeId = 118418618261207, url = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DBTPZ", name = "逃跑者"},
+    {placeId = 189707, url = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DBZRZH", name = "自然灾害"},
+    {placeId = 79546208627805, url = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DB99Y", name = "森林中的99个夜晚"},
+}
+
+local currentPlace = game.PlaceId
+local loaded = false
+
+for _, info in ipairs(scripts) do
+    if currentPlace == info.placeId then
+        print("检测到 " .. info.name .. "，正在加载脚本...")
+        local success, err = pcall(function()
+            loadstring(game:HttpGet(info.url))()
+        end)
+        if success then
+            print(info.name .. " 脚本加载成功！")
+        else
+            warn(info.name .. " 脚本加载失败: " .. tostring(err))
+        end
+        loaded = true
+        break
+    end
+end
+
+if not loaded then
+    print("当前游戏 (" .. currentPlace .. ") 不在支持列表中。")
+end
