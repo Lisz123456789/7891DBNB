@@ -1,28 +1,103 @@
-local scripts = {
-    {placeId = 118418618261207, url = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DBTPZ", name = "逃跑者"},
-    {placeId = 189707, url = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DBZRZH", name = "自然灾害"},
-    {placeId = 79546208627805, url = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DB99Y", name = "森林中的99个夜晚"},
+local Scripts = {
+    Escape = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DBTPZ",
+    Disaster = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DBZRZH",
+    Night99 = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DB99Y",
 }
 
-local currentPlace = game.PlaceId
-local loaded = false
+local PlaceIdMap = {
+    [118418618261207] = Scripts.Escape,
+    [79546208627805] = Scripts.Night99,
+    [189707] = Scripts.Disaster,
+}
 
-for _, info in ipairs(scripts) do
-    if currentPlace == info.placeId then
-        print("检测到 " .. info.name .. "，正在加载脚本...")
-        local success, err = pcall(function()
-            loadstring(game:HttpGet(info.url))()
-        end)
-        if success then
-            print(info.name .. " 脚本加载成功！")
-        else
-            warn(info.name .. " 脚本加载失败: " .. tostring(err))
+local GameIdMap = {
+}
+
+local NameKeywordMap = {
+    ["natural disaster"] = Scripts.Disaster,
+    ["disaster survival"] = Scripts.Disaster,
+    ["99 nights"] = Scripts.Night99,
+    ["escape"] = Scripts.Escape,
+    ["runner"] = Scripts.Escape,
+    ["runaway"] = Scripts.Escape,
+}
+
+local FeatureCheckMap = {
+    {
+        check = function()
+            return game:GetService("ReplicatedStorage"):FindFirstChild("FlowClient") ~= nil
+        end,
+        url = Scripts.Escape,
+    },
+    {
+        check = function()
+            local rs = game:GetService("ReplicatedStorage")
+            return rs:FindFirstChild("GameData") ~= nil and rs:FindFirstChild("RemotesFolder") ~= nil
+        end,
+        url = Scripts.Disaster,
+    },
+    {
+        check = function()
+            local rs = game:GetService("ReplicatedStorage")
+            return rs:FindFirstChild("Item_Info") ~= nil or rs:FindFirstChild("Items") ~= nil
+        end,
+        url = Scripts.Night99,
+    },
+}
+
+local url
+local reason
+
+if PlaceIdMap[game.PlaceId] then
+    url = PlaceIdMap[game.PlaceId]
+    reason = "PlaceId"
+elseif GameIdMap[game.GameId] then
+    url = GameIdMap[game.GameId]
+    reason = "GameId"
+else
+    local name = string.lower(game.Name or "")
+    for keyword, u in pairs(NameKeywordMap) do
+        if string.find(name, keyword, 1, true) then
+            url = u
+            reason = "游戏名"
+            break
         end
-        loaded = true
-        break
+    end
+    if not url then
+        for _, entry in ipairs(FeatureCheckMap) do
+            local ok, result = pcall(entry.check)
+            if ok and result then
+                url = entry.url
+                reason = "游戏特征"
+                break
+            end
+        end
     end
 end
 
-if not loaded then
-    print("当前游戏 (" .. currentPlace .. ") 不在支持列表中。")
+if not url then
+    warn("[DB启动器] 未识别游戏")
+    warn("PlaceId: " .. tostring(game.PlaceId))
+    warn("GameId: " .. tostring(game.GameId))
+    warn("Name: " .. tostring(game.Name))
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "DB启动器",
+        Text = "未识别游戏",
+        Duration = 5,
+    })
+    return
+end
+
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "DB启动器",
+    Text = "识别成功（" .. reason .. "），加载中...",
+    Duration = 3,
+})
+
+local ok, err = pcall(function()
+    loadstring(game:HttpGet(url))()
+end)
+
+if not ok then
+    warn("[DB启动器] 加载失败: " .. tostring(err))
 end
