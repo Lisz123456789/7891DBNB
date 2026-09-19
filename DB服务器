@@ -2,24 +2,14 @@ local Scripts = {
     Escape = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DBTPZ",
     Disaster = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DBZRZH",
     Night99 = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DB99Y",
-}
-
-local PlaceIdMap = {
-    [118418618261207] = Scripts.Escape,
-    [79546208627805] = Scripts.Night99,
-    [189707] = Scripts.Disaster,
+    BlackHawk = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBHYDCD5",
 }
 
 local GameIdMap = {
-}
-
-local NameKeywordMap = {
-    ["natural disaster"] = Scripts.Disaster,
-    ["disaster survival"] = Scripts.Disaster,
-    ["99 nights"] = Scripts.Night99,
-    ["escape"] = Scripts.Escape,
-    ["runner"] = Scripts.Escape,
-    ["runaway"] = Scripts.Escape,
+    [1054526971] = Scripts.BlackHawk,
+    [7326934954] = Scripts.Night99,
+    [65241] = Scripts.Disaster,
+    [7585140258] = Scripts.Escape,
 }
 
 local FeatureCheckMap = {
@@ -45,52 +35,43 @@ local FeatureCheckMap = {
     },
 }
 
+print("[DB Loader] PlaceId = " .. tostring(game.PlaceId))
+print("[DB Loader] GameId  = " .. tostring(game.GameId))
+print("[DB Loader] Name    = " .. tostring(game.Name))
+
 local url
 local reason
 
-if PlaceIdMap[game.PlaceId] then
-    url = PlaceIdMap[game.PlaceId]
-    reason = "PlaceId"
-elseif GameIdMap[game.GameId] then
+if GameIdMap[game.GameId] then
     url = GameIdMap[game.GameId]
     reason = "GameId"
 else
-    local name = string.lower(game.Name or "")
-    for keyword, u in pairs(NameKeywordMap) do
-        if string.find(name, keyword, 1, true) then
-            url = u
-            reason = "游戏名"
+    for _, entry in ipairs(FeatureCheckMap) do
+        local ok, result = pcall(entry.check)
+        if ok and result then
+            url = entry.url
+            reason = "Game Feature"
             break
-        end
-    end
-    if not url then
-        for _, entry in ipairs(FeatureCheckMap) do
-            local ok, result = pcall(entry.check)
-            if ok and result then
-                url = entry.url
-                reason = "游戏特征"
-                break
-            end
         end
     end
 end
 
 if not url then
-    warn("[DB启动器] 未识别游戏")
+    warn("[DB Loader] Unknown game")
     warn("PlaceId: " .. tostring(game.PlaceId))
-    warn("GameId: " .. tostring(game.GameId))
-    warn("Name: " .. tostring(game.Name))
+    warn("GameId:  " .. tostring(game.GameId))
+    warn("Name:    " .. tostring(game.Name))
     game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "DB启动器",
-        Text = "未识别游戏",
+        Title = "DB Loader",
+        Text = "Unknown game",
         Duration = 5,
     })
     return
 end
 
 game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "DB启动器",
-    Text = "识别成功（" .. reason .. "），加载中...",
+    Title = "DB Loader",
+    Text = "Detected (" .. reason .. "), loading...",
     Duration = 3,
 })
 
@@ -99,5 +80,5 @@ local ok, err = pcall(function()
 end)
 
 if not ok then
-    warn("[DB启动器] 加载失败: " .. tostring(err))
+    warn("[DB Loader] Failed to load: " .. tostring(err))
 end
