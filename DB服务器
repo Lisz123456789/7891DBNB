@@ -1,15 +1,21 @@
 local Scripts = {
-    Escape = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DBTPZ",
-    Disaster = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DBZRZH",
-    Night99 = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DB99Y",
-    BlackHawk = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBHYDCD5",
+    Escape        = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DBTPZ",
+    Disaster      = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DBZRZH",
+    Night99       = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DB99Y",
+    BlackHawk     = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBHYDCD5",
+    FlingThings   = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBSYSWYR",
+    IllegalSoccer = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBFGZQ",
+    ELSJQ         = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBELSJQ",
 }
 
 local GameIdMap = {
-    [1054526971] = Scripts.BlackHawk,
-    [7326934954] = Scripts.Night99,
-    [65241] = Scripts.Disaster,
-    [7585140258] = Scripts.Escape,
+    [1054526971]  = Scripts.BlackHawk,
+    [7326934954]  = Scripts.Night99,
+    [65241]       = Scripts.Disaster,
+    [7585140258]  = Scripts.Escape,
+    [2668101271]  = Scripts.FlingThings,
+    [10155360168] = Scripts.IllegalSoccer,
+    [8916086418]  = Scripts.ELSJQ,
 }
 
 local FeatureCheckMap = {
@@ -32,6 +38,20 @@ local FeatureCheckMap = {
             return rs:FindFirstChild("Item_Info") ~= nil or rs:FindFirstChild("Items") ~= nil
         end,
         url = Scripts.Night99,
+    },
+    {
+        check = function()
+            local rs = game:GetService("ReplicatedStorage")
+            local modules = rs:FindFirstChild("Modules")
+            if modules then
+                local actions = modules:FindFirstChild("Actions")
+                if actions then
+                    return actions:FindFirstChild("Sprint") ~= nil or actions:FindFirstChild("BallHitStamina") ~= nil
+                end
+            end
+            return false
+        end,
+        url = Scripts.IllegalSoccer,
     },
 }
 
@@ -63,7 +83,7 @@ if not url then
     warn("Name:    " .. tostring(game.Name))
     game:GetService("StarterGui"):SetCore("SendNotification", {
         Title = "DB Loader",
-        Text = "Unknown game",
+        Text = "未识别的游戏",
         Duration = 5,
     })
     return
@@ -71,7 +91,7 @@ end
 
 game:GetService("StarterGui"):SetCore("SendNotification", {
     Title = "DB Loader",
-    Text = "Detected (" .. reason .. "), loading...",
+    Text = "识别成功（" .. reason .. "），加载中...",
     Duration = 3,
 })
 
