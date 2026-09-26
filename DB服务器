@@ -6,6 +6,9 @@ local Scripts = {
     FlingThings   = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBSYSWYR",
     IllegalSoccer = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBFGZQ",
     ELSJQ         = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBELSJQ",
+    FY            = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBFY",
+    KRS           = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBKRS",
+    XBSL          = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBXBSL",
 }
 
 local GameIdMap = {
@@ -16,6 +19,9 @@ local GameIdMap = {
     [2668101271]  = Scripts.FlingThings,
     [10155360168] = Scripts.IllegalSoccer,
     [8916086418]  = Scripts.ELSJQ,
+    [6993600665]  = Scripts.FY,
+    [5083050005]  = Scripts.KRS,
+    [10598641427] = Scripts.XBSL,
 }
 
 local FeatureCheckMap = {
