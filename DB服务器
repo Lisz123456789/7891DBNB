@@ -1,64 +1,13 @@
 local Scripts = {
-    Escape        = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DBTPZ",
-    Disaster      = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DBZRZH",
-    Night99       = "https://raw.githubusercontent.com/Lisz123456789/7891DBNB/main/DB99Y",
-    BlackHawk     = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBHYDCD5",
-    FlingThings   = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBSYSWYR",
-    IllegalSoccer = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBFGZQ",
-    ELSJQ         = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBELSJQ",
-    FY            = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBFY",
-    KRS           = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBKRS",
-    XBSL          = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBXBSL",
+    BlackHawk   = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBHYDCD5",
+    FlingThings = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBSYSWYR",
+    TacticalSim = "https://raw.githubusercontent.com/Lisz123456789/67/main/DBTZBDMNQ",
 }
 
 local GameIdMap = {
     [1054526971]  = Scripts.BlackHawk,
-    [7326934954]  = Scripts.Night99,
-    [65241]       = Scripts.Disaster,
-    [7585140258]  = Scripts.Escape,
     [2668101271]  = Scripts.FlingThings,
-    [10155360168] = Scripts.IllegalSoccer,
-    [8916086418]  = Scripts.ELSJQ,
-    [6993600665]  = Scripts.FY,
-    [5083050005]  = Scripts.KRS,
-    [10598641427] = Scripts.XBSL,
-}
-
-local FeatureCheckMap = {
-    {
-        check = function()
-            return game:GetService("ReplicatedStorage"):FindFirstChild("FlowClient") ~= nil
-        end,
-        url = Scripts.Escape,
-    },
-    {
-        check = function()
-            local rs = game:GetService("ReplicatedStorage")
-            return rs:FindFirstChild("GameData") ~= nil and rs:FindFirstChild("RemotesFolder") ~= nil
-        end,
-        url = Scripts.Disaster,
-    },
-    {
-        check = function()
-            local rs = game:GetService("ReplicatedStorage")
-            return rs:FindFirstChild("Item_Info") ~= nil or rs:FindFirstChild("Items") ~= nil
-        end,
-        url = Scripts.Night99,
-    },
-    {
-        check = function()
-            local rs = game:GetService("ReplicatedStorage")
-            local modules = rs:FindFirstChild("Modules")
-            if modules then
-                local actions = modules:FindFirstChild("Actions")
-                if actions then
-                    return actions:FindFirstChild("Sprint") ~= nil or actions:FindFirstChild("BallHitStamina") ~= nil
-                end
-            end
-            return false
-        end,
-        url = Scripts.IllegalSoccer,
-    },
+    [9807649116]  = Scripts.TacticalSim,
 }
 
 print("[DB Loader] PlaceId = " .. tostring(game.PlaceId))
@@ -71,25 +20,19 @@ local reason
 if GameIdMap[game.GameId] then
     url = GameIdMap[game.GameId]
     reason = "GameId"
-else
-    for _, entry in ipairs(FeatureCheckMap) do
-        local ok, result = pcall(entry.check)
-        if ok and result then
-            url = entry.url
-            reason = "Game Feature"
-            break
-        end
-    end
+elseif GameIdMap[game.PlaceId] then
+    url = GameIdMap[game.PlaceId]
+    reason = "PlaceId"
 end
 
 if not url then
-    warn("[DB Loader] Unknown game")
+    warn("[DB Loader] 未识别的游戏")
     warn("PlaceId: " .. tostring(game.PlaceId))
     warn("GameId:  " .. tostring(game.GameId))
     warn("Name:    " .. tostring(game.Name))
     game:GetService("StarterGui"):SetCore("SendNotification", {
         Title = "DB Loader",
-        Text = "未识别的游戏",
+        Text = "未识别的游戏，脚本已停止运行",
         Duration = 5,
     })
     return
@@ -97,7 +40,7 @@ end
 
 game:GetService("StarterGui"):SetCore("SendNotification", {
     Title = "DB Loader",
-    Text = "识别成功（" .. reason .. "），加载中...",
+    Text = "识别成功（" .. reason .. "），正在加载对应脚本...",
     Duration = 3,
 })
 
@@ -106,5 +49,5 @@ local ok, err = pcall(function()
 end)
 
 if not ok then
-    warn("[DB Loader] Failed to load: " .. tostring(err))
+    warn("[DB Loader] 脚本加载失败: " .. tostring(err))
 end
